@@ -1,0 +1,219 @@
+import math
+utk_bot = 55 / 3
+
+
+class Road:
+    def __init__(self, x1, y1, seg, sign):
+        self.b_cord = x1, y1
+        coordinates = self.b_cord
+        x, y = coordinates
+        x_s, y_s = (x, y)
+        sign = sign
+        sequence = seg
+        self.segments = list()
+        # segmentum
+        for segmentum in sequence:
+            if segmentum == 'v':
+                curr_segm = V((x_s, y_s))
+                self.segments.append(curr_segm)
+                x_s, y_s, sign = curr_segm.cord_next(sign)
+            if segmentum == 'h':
+                curr_segm = H((x_s, y_s))
+                self.segments.append(curr_segm)
+                x_s, y_s, sign = curr_segm.cord_next(sign)
+            if segmentum[:-1] == 'turnrd':
+                if segmentum[-1] == 'm':
+                    r1 = 0
+                    r2 = 1.5
+                elif segmentum[-1] == 'b':
+                    r1 = 1.5
+                    r2 = 3
+                curr_segm = Turnrd((x_s, y_s, r1, r2))
+                self.segments.append(curr_segm)
+                x_s, y_s, sign = curr_segm.cord_next(sign)
+            if segmentum == 'turnru':
+                if segmentum[-1] == 'm':
+                    r1 = 0
+                    r2 = 1.5
+                else:
+                    r1 = 1.5
+                    r2 = 3
+                    curr_segm = Turnru((x_s, y_s, r1, r2))
+                    self.segments.append(curr_segm)
+                    x_s, y_s, sign = curr_segm.cord_next(sign)
+            if segmentum[:-1] == 'turnld':
+                if segmentum[-1] == 'm':
+                    r1 = 0
+                    r2 = 1.5
+                else:
+                    r1 = 1.5
+                    r2 = 3
+                    curr_segm = Turnld((x_s, y_s, r1, r2))
+                    self.segments.append(curr_segm)
+                    x_s, y_s, sign = curr_segm.cord_next(sign)
+            if segmentum == 'turnlu':
+                if segmentum[-1] == 'm':
+                    r1 = 0
+                    r2 = 1.5
+                else:
+                    r1 = 1.5
+                    r2 = 3
+                    curr_segm = Turnlu((x_s, y_s, r1, r2))
+                    self.segments.append(curr_segm)
+                    x_s, y_s, sign = curr_segm.cord_next(sign)
+
+
+class V:
+    def __init__(self, cord_b):
+        self.base_x, self.base_y = cord_b
+        self.len = 1.5 * utk_bot
+        self.wid = 3 * utk_bot
+
+    def is_in_phragment(self, x, y):
+        if self.base_x <= x <= self.base_x + self.len and self.base_y <= y <= self.base_y + self.wid:
+            return True
+        else:
+            return False
+
+    def dlina(self):
+        return self.wid
+
+    def cord_next(self, sign):
+        self.sign = sign
+        if sign == '+':
+            self.next_x = self.base_x
+            self.next_y = self.base_y + self.wid
+        elif sign == '-':
+            self.next_x = self.base_x
+            self.next_y = self.base_y - self.wid
+        return (self.next_x, self.next_y, self.sign)
+
+
+class H:
+    def __init__(self, cord_b):
+        self.base_x, self.base_y = cord_b
+        self.len = 1.5 * utk_bot
+        self.wid = 3 * utk_bot
+
+    def is_in_phragment(self, x, y):
+        if self.base_x <= x <= self.base_x + self.len and self.base_y <= y <= self.base_y + self.wid:
+            return True
+        else:
+            return False
+
+    def dlina(self):
+        return self.len
+
+    def cord_next(self, sign):
+        self.sign = sign
+        if sign == '+':
+            self.next_x = self.base_x + self.wid
+            self.next_y = self.base_y
+        elif sign == '-':
+            self.next_x = self.base_x - self.wid
+            self.next_y = self.base_y
+        return (self.next_x, self.next_y, self.sign)
+
+
+class Turnrd:
+    def __init__(self, cord_b):
+        self.base_x, self.base_y, self.r1, self.r2 = cord_b
+        self.len = math.pi / 2 * (self.r1 + self.r2) / 2
+
+    def is_in_phragment(self, x, y):
+        ro = ((self.base_x - x) ** 2 + (self.base_y - y) ** 2)
+        ro = math.sqrt(ro)
+        sin = (self.base_x - x) / ro
+        angle = math.asin(sin)
+        if 0 <= angle <= math.pi / 2 and self.r1 <= ro <= self.r2:
+            return True
+        else:
+            return False
+
+    def dlina(self):
+        return self.len
+
+    def cord_next(self, sign):
+        self.sign = '+'
+        self.next_x = self.base_x + self.r1
+        self.next_y = self.base_y + self.r1
+        return (self.next_x, self.next_y, self.sign)
+
+
+class Turnru:
+    def __init__(self, cord_b):
+        self.base_x, self.base_y, self.r1, self.r2 = cord_b
+        self.len = math.pi / 2 * (self.r1 + self.r2) / 2
+
+    def is_in_phragment(self, x, y):
+        ro = ((self.base_x - x) ** 2 + (self.base_y - y) ** 2)
+        ro = math.sqrt(ro)
+        sin = (self.base_x - x) / ro
+        angle = math.asin(sin)
+        if math.pi / 2 <= angle <= math.pi and self.r1 <= ro <= self.r2:
+            return True
+        else:
+            return False
+
+    def dlina(self):
+        return self.len
+
+    def cord_next(self, sign):
+        self.sign = '-'
+        self.next_x = self.base_x + self.r1
+        self.next_y = self.base_y - self.r1
+        return (self.next_x, self.next_y, self.sign)
+
+
+class Turnlu:
+    def __init__(self, cord_b):
+        self.base_x, self.base_y, self.r1, self.r2 = cord_b
+        self.len = math.pi / 2 * (self.r1 + self.r2) / 2
+
+    def is_in_phragment(self, x, y):
+        ro = ((self.base_x - x) ** 2 + (self.base_y - y) ** 2)
+        ro = math.sqrt(ro)
+        sin = (self.base_x - x) / ro
+        angle = math.asin(sin)
+        if math.pi <= angle <= math.pi * 3 / 2 and self.r1 <= ro <= self.r2:
+            return True
+        else:
+            return False
+
+    def dlina(self):
+        return self.len
+
+    def cord_next(self, sign):
+        self.sign = '+'
+        self.next_x = self.base_x - self.r1
+        self.next_y = self.base_y - self.r1
+        return (self.next_x, self.next_y, self.sign)
+
+
+class Turnld:
+    def __init__(self, cord_b):
+        self.base_x, self.base_y, self.r1, self.r2 = cord_b
+        self.len = math.pi / 2 * (self.r1 + self.r2) / 2
+
+    def is_in_phragment(self, x, y):
+        ro = ((self.base_x - x) ** 2 + (self.base_y - y) ** 2)
+        ro = math.sqrt(ro)
+        sin = (self.base_x - x) / ro
+        angle = math.asin(sin)
+        if math.pi * 3 / 2 <= angle <= math.pi * 2 and self.r1 <= ro <= self.r2:
+            return True
+        else:
+            return False
+
+    def dlina(self):
+        return self.len
+
+    def cord_next(self, sign):
+        self.sign = '+'
+        self.next_x = self.base_x + self.r1
+        self.next_y = self.base_y - self.r1
+        return (self.next_x, self.next_y, self.sign)
+
+
+rr1 = Road(2, 5, ['turnldb'], '+')
+print (rr1.segments)
